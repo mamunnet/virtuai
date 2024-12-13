@@ -26,8 +26,8 @@ JellyAI is a modern AI chat application that combines the power of Google's Gemi
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/jellyai.git
-cd jellyai
+git clone https://github.com/mamunnet/virtuai.git
+cd virtuai
 ```
 
 2. Install dependencies:
