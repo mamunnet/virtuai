@@ -42,8 +42,72 @@ export default {
         md: "0.5rem",
         sm: "0.25rem",
       },
+      typography: {
+        DEFAULT: {
+          css: {
+            color: '#fafafa',
+            a: {
+              color: '#22c55e',
+              '&:hover': {
+                color: '#22c55e',
+              },
+            },
+            strong: {
+              color: '#fafafa',
+            },
+            'ol > li::marker': {
+              color: '#a1a1aa',
+            },
+            'ul > li::marker': {
+              color: '#a1a1aa',
+            },
+            hr: {
+              borderColor: '#27272a',
+            },
+            blockquote: {
+              borderLeftColor: '#22c55e',
+              color: '#a1a1aa',
+            },
+            h1: {
+              color: '#fafafa',
+            },
+            h2: {
+              color: '#fafafa',
+            },
+            h3: {
+              color: '#fafafa',
+            },
+            h4: {
+              color: '#fafafa',
+            },
+            'figure figcaption': {
+              color: '#a1a1aa',
+            },
+            code: {
+              color: '#fafafa',
+            },
+            'a code': {
+              color: '#22c55e',
+            },
+            pre: {
+              color: '#fafafa',
+              backgroundColor: '#27272a',
+            },
+            thead: {
+              color: '#fafafa',
+              borderBottomColor: '#27272a',
+            },
+            'tbody tr': {
+              borderBottomColor: '#27272a',
+            },
+          },
+        },
+      },
     },
   },
-  plugins: [require("@tailwindcss/forms")],
+  plugins: [
+    require("@tailwindcss/forms"),
+    require("@tailwindcss/typography"),
+  ],
 }
 

@@ -1,6 +1,42 @@
-import { Moon, Sun, Bell, Lock, HelpCircle, Info } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Moon, Sun, Bell, Lock, HelpCircle, Info, User, Camera, Loader2 } from 'lucide-react';
+import { auth } from '../../lib/firebase';
+import { updateProfile } from 'firebase/auth';
 
 export function SettingsPage() {
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [displayName, setDisplayName] = useState('');
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [error, setError] = useState('');
+
+  // Update local state when auth state changes
+  useEffect(() => {
+    if (auth.currentUser) {
+      setDisplayName(auth.currentUser.displayName || '');
+    }
+  }, [auth.currentUser]);
+
+  const handleUpdateProfile = async () => {
+    if (!auth.currentUser) return;
+    setIsUpdating(true);
+    setError('');
+
+    try {
+      await updateProfile(auth.currentUser, {
+        displayName: displayName.trim()
+      });
+      
+      // Force refresh the user data
+      await auth.currentUser.reload();
+      setIsEditingProfile(false);
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      setError('Failed to update profile. Please try again.');
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="space-y-1">
@@ -9,6 +45,83 @@ export function SettingsPage() {
       </div>
 
       <div className="space-y-4">
+        {/* Profile Section */}
+        <div className="space-y-4">
+          <h3 className="text-sm font-medium">Profile</h3>
+          <div className="bg-secondary/10 rounded-xl p-4 space-y-4">
+            {error && (
+              <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-500 text-sm">
+                {error}
+              </div>
+            )}
+            
+            <div className="flex items-center gap-4">
+              {auth.currentUser?.photoURL ? (
+                <img 
+                  src={auth.currentUser.photoURL} 
+                  alt={auth.currentUser.displayName || 'Profile'} 
+                  className="w-16 h-16 rounded-full border border-border/40"
+                />
+              ) : (
+                <div className="w-16 h-16 rounded-full bg-primary/10 border border-border/40 flex items-center justify-center">
+                  <User className="w-8 h-8 text-primary/70" />
+                </div>
+              )}
+              <div className="flex-1">
+                {isEditingProfile ? (
+                  <div className="space-y-3">
+                    <input
+                      type="text"
+                      value={displayName}
+                      onChange={(e) => setDisplayName(e.target.value)}
+                      className="w-full px-3 py-2 rounded-lg bg-secondary/10 border border-border/40 
+                        focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50"
+                      placeholder="Enter your name"
+                    />
+                    <div className="flex gap-2">
+                      <button
+                        onClick={handleUpdateProfile}
+                        disabled={isUpdating || !displayName.trim()}
+                        className="px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-sm font-medium
+                          hover:opacity-90 transition-opacity flex items-center gap-2 disabled:opacity-50"
+                      >
+                        {isUpdating && <Loader2 className="w-4 h-4 animate-spin" />}
+                        Save
+                      </button>
+                      <button
+                        onClick={() => {
+                          setIsEditingProfile(false);
+                          setDisplayName(auth.currentUser?.displayName || '');
+                          setError('');
+                        }}
+                        className="px-3 py-1.5 rounded-lg bg-secondary/20 text-sm font-medium
+                          hover:bg-secondary/30 transition-colors"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-1">
+                    <div className="font-medium">
+                      {auth.currentUser?.displayName || 'No name set'}
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      {auth.currentUser?.email}
+                    </div>
+                    <button
+                      onClick={() => setIsEditingProfile(true)}
+                      className="text-sm text-primary hover:underline font-medium"
+                    >
+                      Edit Profile
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Appearance */}
         <div className="space-y-4">
           <h3 className="text-sm font-medium">Appearance</h3>
